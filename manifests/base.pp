@@ -1,5 +1,12 @@
 Exec { path => ["/usr/bin", "/usr/local/bin", "/bin"] }
 
+class box_cleanup {
+  exec { "fix_hosts":
+    command => "sed -i -e 's/127.0.1.1.*/127.0.1.1 lucid64/' /etc/hosts",
+    onlyif => "grep comcast /etc/hosts",
+  }
+}
+
 class appscale_dependencies {
   exec { "apt-get update": }
 
@@ -10,4 +17,5 @@ class appscale_dependencies {
   }
 }
 
+include box_cleanup
 include appscale_dependencies
