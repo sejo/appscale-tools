@@ -53,7 +53,7 @@ install: build
 	mkdir -p $(DESTDIR)/usr/local/appscale-tools
 	cp -r bin lib templates $(DESTDIR)/usr/local/appscale-tools
 	cp LICENSE README $(DESTDIR)/usr/local/appscale-tools
-	bash $(CURDIR)/debian/appscale_install_$(DIST).sh tools $(DESTDIR)
+	bash $(CURDIR)/debian/appscale_install.sh tools $(DESTDIR)
 
 # Build architecture-independent files here.
 binary-indep: install
