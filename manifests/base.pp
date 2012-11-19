@@ -5,6 +5,13 @@ class box_cleanup {
     command => "sed -i -e 's/127.0.1.1.*/127.0.1.1 lucid64/' /etc/hosts",
     onlyif => "grep comcast /etc/hosts",
   }
+
+  file { "/home/vagrant/appscale":
+    ensure => directory,
+    mode => 0755,
+    owner => vagrant,
+    group => vagrant,
+  }
 }
 
 class appscale_dependencies {
