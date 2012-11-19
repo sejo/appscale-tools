@@ -2,3 +2,4 @@
 *.swp
 *.pyc
 ips
+/docs/_build/
