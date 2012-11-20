@@ -22,6 +22,22 @@ class appscale_dependencies {
     ensure => present,
     require => Exec["apt-get update"],
   }
+
+  file { "/usr/lib/jvm/java-6-openjdk/lib/security":
+    ensure => directory,
+    recurse => true,
+    mode => 0775,
+    owner => root,
+    group => root,
+  }
+
+  file { "/usr/lib/jvm/java-6-openjdk/lib/cacerts":
+    ensure => present,
+    recurse => true,
+    mode => 0664,
+    owner => root,
+    group => root,
+  }
 }
 
 include box_cleanup
