@@ -15,7 +15,7 @@ install: profile_dir
 	cp LICENSE README $(DESTDIR)/usr/local/appscale-tools
 
 	install -m 0644 etc/profile.d/appscale.sh $(DESTDIR)/etc/profile.d/appscale.sh
-	install -m 0644 etc/profile.d/appscale-tools.sh $(DESTDIR)/etc/profile.d/appscale-tools.sh
+	install -m 0644 etc/profile.d/appscale_tools.sh $(DESTDIR)/etc/profile.d/appscale_tools.sh
 
 .PHONY: profile_dir
 profile_dir:
