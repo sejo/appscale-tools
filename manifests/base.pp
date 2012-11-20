@@ -1,4 +1,4 @@
-Exec { path => ["/usr/bin", "/usr/local/bin", "/bin"] }
+Exec { path => ["/usr/bin", "/usr/local/bin", "/usr/sbin", "/bin", "/sbin"] }
 
 class box_cleanup {
   exec { "fix_hosts":
@@ -47,6 +47,29 @@ class appscale_development {
   }
 }
 
+class appscale_tools {
+  exec { "package_appscale_tools":
+    command => "make deb",
+    cwd => "/home/vagrant/appscale/appscale-tools",
+    unless => "test -e /home/vagrant/appscale/appscale-tools*deb",
+    logoutput => "on_failure",
+  }
+
+  exec { "appscale_tools_deps":
+    command => "apt-get install -y $(grep '^Depends' /home/vagrant/appscale/appscale-tools/debian/control | sed -e 's/.*Depends: //' -e 's/,//g')",
+    require => [Exec["apt-get update"], Exec["package_appscale_tools"]],
+    logoutput => "on_failure",
+  }
+
+  exec { "install_appscale_tools":
+    command => "dpkg -i appscale-tools*deb",
+    cwd => "/home/vagrant/appscale",
+    require => Exec["appscale_tools_deps"],
+    logoutput => "on_failure",
+  }
+}
+
 include box_cleanup
 include appscale_dependencies
 include appscale_development
+include appscale_tools
