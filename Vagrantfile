@@ -41,6 +41,9 @@ Vagrant::Config.run do |config|
   config.vm.share_folder("v-appscale-tools-creds", "/home/vagrant/.appscale-tools", "~/.appscale-tools",
                          :create => true)
 
+  config.vm.share_folder("v-gnupg", "/home/vagrant/.gnupg", "~/.gnupg",
+                         :create => true)
+
   # Enable provisioning with Puppet stand alone.  Puppet manifests
   # are contained in a directory path relative to this Vagrantfile.
   # You will need to create the manifests directory and a manifest in
