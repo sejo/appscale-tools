@@ -16,6 +16,7 @@ install: profile_dir
 
 	install -m 0644 etc/profile.d/appscale.sh $(DESTDIR)/etc/profile.d/appscale.sh
 	install -m 0644 etc/profile.d/appscale_tools.sh $(DESTDIR)/etc/profile.d/appscale_tools.sh
+	install -m 0644 etc/profile.d/appscale_config.sh $(DESTDIR)/etc/profile.d/appscale_config.sh
 
 .PHONY: profile_dir
 profile_dir:
