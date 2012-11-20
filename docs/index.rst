@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    getting_started
+   first_run
 
 Indices and tables
 ==================
