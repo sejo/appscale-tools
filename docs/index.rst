@@ -13,6 +13,7 @@ Contents:
 
    getting_started
    first_run
+   packaging
 
 Indices and tables
 ==================

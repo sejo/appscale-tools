@@ -1,25 +1,17 @@
 First Run
 =========
 
-Create the AWS credentials file (get from Tyler)
+Once you've completed all the Getting Started steps, confirm EC2 tools are working by running the command::
 
-Source the AWS credentials file
+    ec2-describe-instances
 
 cd /root
 
-Check that ``ec2-describe-instances`` works.  This means AppScale will work.
 
 ``appscale-run-instances`` [with flags] - fires up a cloud
 
-
-6.5 G with code
-
-Installs all NoSQL packages
-
-
     ec2-run-instances -t m1.large -n 1 -k mykeyname ami-67b202ae
     ec2-describe-instances | grep mykeyname
-
 
 Take a snapshot and make a personal AMI::
 
