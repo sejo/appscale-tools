@@ -160,10 +160,6 @@ installappscaletools()
 
     # add to path
     mkdir -p ${DESTDIR}/etc/profile.d
-    cat > ${DESTDIR}/etc/profile.d/appscale-tools.sh <<EOF
-export TOOLS_PATH=/usr/local/appscale-tools
-export PATH=\${PATH}:\${TOOLS_PATH}/bin
-EOF
 }
 
 postinstallappscaletools()
