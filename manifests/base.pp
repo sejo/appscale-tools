@@ -40,5 +40,13 @@ class appscale_dependencies {
   }
 }
 
+class appscale_development {
+  file { "/home/vagrant/.devscripts":
+    ensure => link,
+    target => "/home/vagrant/.appscale-tools/devscripts",
+  }
+}
+
 include box_cleanup
 include appscale_dependencies
+include appscale_development
