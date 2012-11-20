@@ -17,15 +17,27 @@ deb:
 	debuild -us -uc
 
 .PHONY: install
-install: profile_dir
-	mkdir -p $(DESTDIR)/usr/local/appscale-tools
-	cp -r bin lib templates $(DESTDIR)/usr/local/appscale-tools
-	cp LICENSE README $(DESTDIR)/usr/local/appscale-tools
+install: build $(DESTDIR)
+	rsync -av build/ $(DESTDIR)/
 
-	install -m 0644 etc/profile.d/appscale.sh $(DESTDIR)/etc/profile.d/appscale.sh
-	install -m 0644 etc/profile.d/appscale_tools.sh $(DESTDIR)/etc/profile.d/appscale_tools.sh
-	install -m 0644 etc/profile.d/appscale_config.sh $(DESTDIR)/etc/profile.d/appscale_config.sh
+$(DESTDIR):
+	mkdir -p $(DESTDIR)
 
-.PHONY: profile_dir
-profile_dir:
-	mkdir -p $(DESTDIR)/etc/profile.d
+.PHONY: uninstall
+uninstall: build
+	-find build -type f | sed -e 's/^build/$(DESTDIR)/' | xargs rm
+	-find build -type d | sed -e 's/^build/$(DESTDIR)/' | awk '{ print length(), $$0 | "sort -n -r" }' | awk '{print $$2}' | xargs rmdir
+
+.PHONY: build
+build:
+	mkdir -p build
+
+	mkdir -p build/etc/profile.d
+
+	mkdir -p build/usr/local/appscale-tools
+	cp -r bin lib templates build/usr/local/appscale-tools
+	cp LICENSE README build/usr/local/appscale-tools
+
+	install -m 0644 etc/profile.d/appscale.sh build/etc/profile.d/appscale.sh
+	install -m 0644 etc/profile.d/appscale_tools.sh build/etc/profile.d/appscale_tools.sh
+	install -m 0644 etc/profile.d/appscale_config.sh build/etc/profile.d/appscale_config.sh
