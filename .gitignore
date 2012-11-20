@@ -2,4 +2,9 @@
 *.swp
 *.pyc
 ips
+/build-stamp
+/configure-stamp
+/debian/appscale-tools/
+/debian/appscale-tools.substvars
+/debian/files
 /docs/_build/
