@@ -50,13 +50,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/appscale.
-	mkdir -p $(DESTDIR)/usr/local/appscale-tools
-	cp -r bin lib templates $(DESTDIR)/usr/local/appscale-tools
-	cp LICENSE README $(DESTDIR)/usr/local/appscale-tools
-
 	DESTDIR=$(DESTDIR) $(MAKE) install
-
-	bash $(CURDIR)/debian/appscale_install.sh tools $(DESTDIR)
 
 # Build architecture-independent files here.
 binary-indep: install
