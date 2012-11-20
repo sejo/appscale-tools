@@ -4,6 +4,14 @@ all: test
 .PHONY: test
 test:
 
+.PHONY: deb_signed
+deb_signed:
+	debuild
+
+.PHONY: deb_source
+deb_source:
+	debuild -S
+
 .PHONY: deb
 deb:
 	debuild -us -uc
