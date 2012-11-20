@@ -1,5 +1,8 @@
 .PHONY: all
-all: install
+all: test
+
+.PHONY: test
+test:
 
 .PHONY: deb
 deb:
