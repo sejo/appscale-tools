@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /etc/profile.d/appscale.sh
+source /etc/profile.d/appscale_tools.sh
 
 case "$1" in
     configure)

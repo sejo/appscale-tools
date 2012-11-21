@@ -38,6 +38,5 @@ build:
 	cp -r bin lib templates build/usr/local/appscale-tools
 	cp LICENSE README build/usr/local/appscale-tools
 
-	install -m 0644 etc/profile.d/appscale.sh build/etc/profile.d/appscale.sh
 	install -m 0644 etc/profile.d/appscale_tools.sh build/etc/profile.d/appscale_tools.sh
 	install -m 0644 etc/profile.d/appscale_config.sh build/etc/profile.d/appscale_config.sh
