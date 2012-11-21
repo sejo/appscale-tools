@@ -21,6 +21,7 @@ class appscale_dependencies {
              "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx"]:
     ensure => present,
     require => Exec["apt-get update"],
+    before => [File["/usr/lib/jvm/java-6-openjdk/lib/security"], File["/usr/lib/jvm/java-6-openjdk/lib/cacerts"]],
   }
 
   file { "/usr/lib/jvm/java-6-openjdk/lib/security":
