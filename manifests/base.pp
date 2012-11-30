@@ -17,7 +17,7 @@ class box_cleanup {
 class appscale_dependencies {
   exec { "apt-get update": }
 
-  package { ["build-essential", "debhelper", "dh-make", "fakeroot", "lintian", "gnupg", "pbuilder",
+  package { ["build-essential", "debhelper", "dh-make", "dupload", "fakeroot", "lintian", "gnupg", "pbuilder",
              "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx"]:
     ensure => present,
     require => Exec["apt-get update"],
@@ -46,6 +46,11 @@ class appscale_development {
     ensure => link,
     target => "/home/vagrant/.appscale-tools/devscripts",
   }
+
+  file { "/etc/dupload.conf":
+    ensure => present,
+    source => "/home/vagrant/appscale/appscale-tools/files/etc/dupload.conf",
+  }
 }
 
 class appscale_tools {
@@ -70,7 +75,20 @@ class appscale_tools {
   }
 }
 
+class appscale {
+  file { "/etc/apt/sources.list.d/appscale.list":
+    ensure => present,
+    source => "/home/vagrant/appscale/appscale-tools/files/etc/apt/sources.list.d/appscale.list",
+  }
+
+  exec { "add_appscale_key_to_apt":
+    command => "gpg --export 'AppScale Releases' | apt-key add -",
+    unless => "sudo apt-key list | grep AppScale",
+  }
+}
+
 include box_cleanup
 include appscale_dependencies
 include appscale_development
+include appscale
 include appscale_tools
