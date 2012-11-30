@@ -38,6 +38,9 @@ Vagrant::Config.run do |config|
   config.vm.share_folder("v-root", "/home/vagrant/appscale/appscale-tools", ".",
                          :create => true)
 
+  config.vm.share_folder("v-appscale", "/srv/appscale", "~/Appscale",
+                         :create => true)
+
   config.vm.share_folder("v-appscale-tools-creds", "/home/vagrant/.appscale-tools", "~/.appscale-tools",
                          :create => true)
 
