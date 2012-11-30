@@ -1,5 +1,5 @@
-Source: appscale
-Section: unknown
+Source: appscale-tools
+Section: utils
 Priority: optional
 Maintainer: AppScale Developer <appscale_developer@googlegroups.com>
 Build-Depends: debhelper (>= 7)
