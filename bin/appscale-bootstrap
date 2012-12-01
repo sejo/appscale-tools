@@ -4,6 +4,7 @@ import os
 import time
 import sh
 import string
+import time
 
 from clint.command import Command, run_command
 from clint.textui import colored, puts
@@ -101,7 +102,8 @@ class Bootstrap(Command):
 
         ec2_create_image = sh.Command('ec2-create-image')
 
-        for line in ec2_create_image(self.instance_id, _iter=True):
+        image_name = 'appscale_cluster_{0}'.format(int(time.time()))
+        for line in ec2_create_image(self.instance_id, '-n', image_name, _iter=True):
             self.logger.info(line)
 
     def install_appscale(self):
