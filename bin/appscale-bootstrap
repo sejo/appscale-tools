@@ -56,8 +56,18 @@ BOOTSTRAP_DOWNLOADER = os.path.abspath(os.path.join(os.path.dirname(__file__), '
 
 class Bootstrap(Command):
     """
-    Bootstrap AppScale on an EC2 environment
+    Bootstrap AppScale on an EC2 environment.
+
+    To install AppScale on an EC2 instance, simply run this command like so:
+
+    appscale-bootstrap
+
+    In the case where there is an error that can be continued from, rerun the
+    command specifying the instance that was created in the first run:
+
+    appscale-bootstrap <instance_id>
     """
+
     def __init__(self, doc=None):
         self.ec2_hostname = None
 
