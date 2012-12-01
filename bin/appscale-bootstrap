@@ -101,6 +101,23 @@ class Bootstrap(Command):
         self.logger.debug('Catting downloader from {0}'.format(BOOTSTRAP_DOWNLOADER))
         self.logger.debug('Remote command: {0}'.format(remote_command))
 
+        # attempt to get an SSH connection up to 5 times because we might try
+        # to connect to the machine while it's still trying to boot.
+        success = False
+        for try_num in range(5):
+            try:
+                for line in self.ssh(sh.cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
+                    self.logger.info(line)
+
+                success = True
+                break
+            except sh.ErrorReturnCode:
+                self.logger.error('SSH failure?  Trying again in 5 seconds.')
+                time.sleep(5.0)
+
+        if not success:
+            raise self.CommandError('Unable to bootstrap instance!')
+
     @property
     def key_name(self):
         return os.path.basename(SSH_KEY).replace('id_', '')
