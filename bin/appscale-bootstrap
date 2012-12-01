@@ -49,9 +49,9 @@ SSH_ARGS = ('-o', 'UserKnownHostsFile /dev/null', '-o', 'StrictHostKeyChecking n
 CURRENT_BRANCH = os.path.basename(str(sh.git('symbolic-ref', 'HEAD'))).strip()
 CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
 
-EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bin/appscale-bootstrap-ec2')
+EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bootstrap/appscale-bootstrap-ec2')
 
-BOOTSTRAP_DOWNLOADER = os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader')
+BOOTSTRAP_DOWNLOADER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader'))
 
 
 class Bootstrap(Command):
