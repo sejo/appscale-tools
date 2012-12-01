@@ -11,7 +11,7 @@ class appscale_dependencies {
   exec { "apt-get update": }
 
   package { ["build-essential", "debhelper", "dh-make", "dupload", "fakeroot", "lintian", "gnupg", "pbuilder",
-             "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx"]:
+             "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx", "python-setuptools"]:
     ensure => present,
     require => Exec["apt-get update"],
     before => [File["/usr/lib/jvm/java-6-openjdk/lib/security"], File["/usr/lib/jvm/java-6-openjdk/lib/cacerts"]],
@@ -32,9 +32,25 @@ class appscale_dependencies {
     owner => root,
     group => root,
   }
+
+  exec { "install_pip":
+    command => "easy_install pip",
+    unless => "which pip",
+  }
+
+  exec { "install_virtualenvwrapper":
+    command => "pip install virtualenvwrapper",
+    unless => "test -e /usr/local/bin/virtualenvwrapper_lazy.sh",
+    require => Exec["install_pip"],
+  }
 }
 
 class appscale_development {
+  file { "/home/vagrant/.bashrc":
+    ensure => present,
+    source => "/srv/appscale/repo/appscale-tools/files/home/vagrant/.bashrc",
+  }
+
   file { "/home/vagrant/.devscripts":
     ensure => link,
     target => "/home/vagrant/.appscale-tools/devscripts",
@@ -43,6 +59,23 @@ class appscale_development {
   file { "/etc/dupload.conf":
     ensure => present,
     source => "/srv/appscale/repo/appscale-tools/files/etc/dupload.conf",
+  }
+
+  exec { "appscale_tools_venv":
+    command => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv appscale-tools'",
+    unless => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && workon appscale-tools'",
+  }
+
+  exec { "install python requirements":
+    command => "/var/lib/appscale/virtualenvs/appscale-tools/bin/pip install -r /srv/appscale/repo/appscale-tools/requirements.txt",
+    require => Exec["appscale_tools_venv"],
+    before => Exec["set_appscale_tools_venv_permissions"],
+  }
+
+  exec { "set_appscale_tools_venv_permissions":
+    command => "chown -R vagrant.vagrant /var/lib/appscale",
+    require => Exec["appscale_tools_venv"],
+    logoutput => "on_failure",
   }
 }
 
