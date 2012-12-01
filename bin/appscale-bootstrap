@@ -24,10 +24,8 @@ def get_script_url(base, branch, file_path):
 
     return '{0}/{1}{2}'.format(base, branch, file_path)
 
-AMIS = {
-    't1.micro': 'ami-c7b202ae',
-    'm1.small': 'ami-1db20274',
-}
+# EBS-backed AMI so it can be imaged
+AMI = 'ami-c7b202ae'
 
 # INSTANCE    i-37b8b548  ami-1db20274 ec2-23-22-46-174.compute-1.amazonaws.com    ip-10-4-54-135.ec2.internal running \
 # berto   0       m1.small    2012-12-01T02:28:30+0000    us-east-1c  aki-427d952 \
@@ -177,7 +175,7 @@ class Bootstrap(Command):
             return instance_id
 
         for line in EC2_RUN_INSTANCES(
-                AMIS[self.instance_type], '-v', '-n', '1', '-t', self.instance_type, '-k', self.key_name, _iter=True):
+                AMI, '-v', '-n', '1', '-t', self.instance_type, '-k', self.key_name, _iter=True):
             matches = EC2_RUN_INSTANCES_RE.match(line)
             if matches:
                 instance_id = matches.group('instance_id')
