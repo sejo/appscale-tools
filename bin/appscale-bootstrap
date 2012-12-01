@@ -137,6 +137,8 @@ class Bootstrap(Command):
 
         self.install_appscale()
 
+        self.stop_instance()
+
         now = time.time()
         elapsed = now - start
 
@@ -174,6 +176,12 @@ class Bootstrap(Command):
             raise self.CommandError('Did not find instance id')
 
         return instance_id
+
+    def stop_instance(self):
+        ec2_stop_instances = sh.Command('ec2-stop-instances')
+        ec2_stop_instances(self.instance_id)
+
+        self.wait_for_instance(desired_state=EC2_STOPPED_STATE)
 
     def wait_for_instance(self, desired_state=EC2_RUNNING_STATE):
         """
