@@ -175,7 +175,7 @@ class Bootstrap(Command):
 
         return instance_id
 
-    def wait_for_instance(self):
+    def wait_for_instance(self, desired_state=EC2_RUNNING_STATE):
         """
         Wait for an instance to go from pending to running.
 
@@ -193,24 +193,32 @@ class Bootstrap(Command):
                 matches = EC2_DESCRIBE_INSTANCES_RE.match(line)
                 if matches:
                     t_running_state = matches.group('running_state')
+                    break
 
-            if t_running_state is None:
-                raise self.CommandError('failed to parse ec2-describe-instances output')
-            else:
+            if t_running_state:
                 running_state = t_running_state
+            else:
+                raise self.CommandError('failed to parse ec2-describe-instances output')
 
-            if running_state == EC2_RUNNING_STATE:
+            if running_state == desired_state:
                 describe_instances_info = matches.groupdict()
                 break
 
-            self.logger.debug('instance {0} in {1} state, waiting ...'.format(self.instance_id, running_state))
+            self.logger.debug('instance {0} in {1} state, waiting for {2} state.'.format(
+                self.instance_id, running_state, desired_state)
+            )
+
             time.sleep(2.0)
 
-        if running_state != EC2_RUNNING_STATE:
-            raise self.CommandError('EC2 instance is in running state {0} instead of {1}'.format(running_state, EC2_RUNNING_STATE))
+        if running_state != desired_state:
+            raise self.CommandError('EC2 instance is in running state {0} instead of {1}'.format(running_state, desired_state))
 
-        # set the ec2_hostname from the last regex match
-        self.ec2_hostname = describe_instances_info['ec2_hostname']
+        # if the machine's state is running, grab the hostname, otherwise clear it
+        if running_state == EC2_RUNNING_STATE:
+            # set the ec2_hostname from the last regex match
+            self.ec2_hostname = describe_instances_info['ec2_hostname']
+        else:
+            self.ec2_hostname = None
 
 
 run_command(__name__, Bootstrap)
