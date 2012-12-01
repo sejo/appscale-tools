@@ -98,9 +98,8 @@ class Bootstrap(Command):
         remote_command = 'cat > {path} && bash {path} {url}'.format(
                 path=tmp_downloader, url=EC2_BOOTSTRAP_SCRIPT)
 
-        for line in self.ssh(cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
-            sys.stdout.write(line)
-            sys.stdout.flush()
+        self.logger.debug('Catting downloader from {0}'.format(BOOTSTRAP_DOWNLOADER))
+        self.logger.debug('Remote command: {0}'.format(remote_command))
 
     @property
     def key_name(self):
@@ -114,7 +113,7 @@ class Bootstrap(Command):
         self._check_ssh_key()
 
         self.instance_id = self.start_instance()
-        puts('instance id: {0}'.format(self.instance_id))
+        self.logger.info('instance id: {0}'.format(self.instance_id))
 
         self.wait_for_instance()
 
