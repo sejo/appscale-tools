@@ -107,6 +107,10 @@ class Bootstrap(Command):
         return os.path.basename(SSH_KEY).replace('id_', '')
 
     def run(self):
+        start = time.time()
+
+        self.logger.info('Bootstrapping EC2 instance')
+
         self._check_ssh_key()
 
         self.instance_id = self.start_instance()
@@ -115,6 +119,11 @@ class Bootstrap(Command):
         self.wait_for_instance()
 
         self.install_appscale()
+
+        now = time.time()
+        elapsed = now - start
+
+        self.logger.info('Done.  Elapsed time: {0}s'.format(elapsed))
 
     @property
     def ssh(self):
