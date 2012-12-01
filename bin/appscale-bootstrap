@@ -1,8 +1,10 @@
 #!/usr/bin/env python
+# -*- encoding: utf-8 -*-
 import os
 import re
 import time
 import sh
+import string
 
 from clint.command import Command, run_command
 from clint.textui import colored, puts
@@ -117,7 +119,8 @@ class Bootstrap(Command):
         for try_num in range(5):
             try:
                 for line in self.ssh(sh.cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
-                    self.logger.info(line)
+                    log_line = ''.join(s for s in line.strip() if s in string.printable)
+                    self.logger.info(log_line)
 
                 success = True
                 break
