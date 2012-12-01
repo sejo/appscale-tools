@@ -25,8 +25,11 @@ def get_script_url(base, branch, file_path):
 
     return '{0}/{1}{2}'.format(base, branch, file_path)
 
-# EBS-backed AMI so it can be imaged
-AMI = 'ami-c7b202ae'
+# official Ubuntu EBS-backed AMI so it can be imaged
+#AMI = 'ami-c7b202ae'
+
+# AppScale Lucid AMI that has been upgraded and has git installed
+AMI = 'ami-d59818bc'
 
 # ec2-run-instances ami-1db20274 -t m1.small --region us-east-1 --key ${EC2_KEYPAIR_US_EAST_1}
 EC2_RUN_INSTANCES = sh.Command('ec2-run-instances')
