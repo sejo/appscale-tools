@@ -77,6 +77,24 @@ class appscale_development {
     before => Exec["set_appscale_tools_venv_permissions"],
   }
 
+  exec { "check install appscale-tools package":
+    cwd => "/tmp",
+    command => "echo hi",
+    before => Exec["set_appscale_tools_venv_permissions"],
+    notify => Exec["install appscale-tools package"],
+    unless => "/var/lib/appscale/virtualenvs/appscale-tools/bin/python -c 'from appscaletools import ec2'",
+    logoutput => "on_failure",
+  }
+
+  exec { "install appscale-tools package":
+    cwd => "/srv/appscale/repo/appscale-tools",
+    command => "/var/lib/appscale/virtualenvs/appscale-tools/bin/python setup.py install",
+    require => Exec["appscale_tools_venv"],
+    before => Exec["set_appscale_tools_venv_permissions"],
+    refreshonly => true,
+    logoutput => "on_failure",
+  }
+
   exec { "set_appscale_tools_venv_permissions":
     command => "chown -R vagrant.vagrant /var/lib/appscale",
     require => Exec["appscale_tools_venv"],
