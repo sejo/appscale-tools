@@ -97,11 +97,12 @@ class Bootstrap(Command):
         Create an image out of the instance that was just created
         """
 
-        self.logger.debug('create_image')
+        image_name = 'appscale_cluster_{0}'.format(int(time.time()))
+
+        self.logger.info('creating image with name: {0}'.format(image_name))
 
         ec2_create_image = sh.Command('ec2-create-image')
 
-        image_name = 'appscale_cluster_{0}'.format(int(time.time()))
         for line in ec2_create_image(self.instance_id, '-n', image_name, _iter=True):
             self.logger.info(line)
 
