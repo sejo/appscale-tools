@@ -89,6 +89,18 @@ class Bootstrap(Command):
 
             raise self.CommandError(message)
 
+    def create_image(self):
+        """
+        Create an image out of the instance that was just created
+        """
+
+        self.logger.debug('create_image')
+
+        ec2_create_image = sh.Command('ec2-create-image')
+
+        for line in ec2_create_image(self.instance_id, _iter=True):
+            self.logger.info(line)
+
     def install_appscale(self):
         """
         SSH into the VM and install AppScale
@@ -138,6 +150,8 @@ class Bootstrap(Command):
         self.install_appscale()
 
         self.stop_instance()
+
+        self.create_image()
 
         now = time.time()
         elapsed = now - start
