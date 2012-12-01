@@ -61,6 +61,11 @@ class appscale_development {
     source => "/srv/appscale/repo/appscale-tools/files/etc/dupload.conf",
   }
 
+  file { "/etc/pylintrc":
+    ensure => present,
+    source => "/srv/appscale/repo/appscale-tools/files/etc/pylintrc",
+  }
+
   exec { "appscale_tools_venv":
     command => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv appscale-tools'",
     unless => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && workon appscale-tools'",
