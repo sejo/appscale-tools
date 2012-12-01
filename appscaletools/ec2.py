@@ -7,6 +7,7 @@ EC2_DESCRIBE_INSTANCES = sh.Command('ec2-describe-instances')
 
 EC2_RUN_INSTANCES_RE = re.compile(r'INSTANCE\s+(?P<instance_id>\S+).*')
 EC2_RUNNING_STATE = 'running'
+EC2_STOPPED_STATE = 'stopped'
 
 # -- samples for testing and perusal -- #
 
