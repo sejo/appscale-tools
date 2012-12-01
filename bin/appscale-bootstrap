@@ -162,6 +162,7 @@ class Bootstrap(Command):
         elapsed = now - start
 
         self.logger.info('Done.  Elapsed time: {0}s'.format(elapsed))
+        self.logger.info('Make sure to terminate instance {0}.'.format(self.instance_id))
 
     @property
     def ssh(self):
