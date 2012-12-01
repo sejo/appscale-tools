@@ -1,0 +1,190 @@
+#!/usr/bin/env python
+import os
+import re
+import time
+import sh
+
+from clint.command import Command, run_command
+from clint.textui import colored, puts
+from sh import ssh
+
+from debgit.branch import get_upstream_for_branch
+
+def get_script_url(base, branch, file_path):
+    """
+    Generate a URL from the given components.
+
+    If the URL happens to be github.com, convert it to raw.github.com
+    """
+
+    if '/github.com' in base:
+        base = base.replace('github.com', 'raw.github.com')
+
+    return '{0}/{1}{2}'.format(base, branch, file_path)
+
+AMIS = {
+    't1.micro': 'ami-c7b202ae',
+    'm1.small': 'ami-1db20274',
+}
+
+# INSTANCE    i-37b8b548  ami-1db20274 ec2-23-22-46-174.compute-1.amazonaws.com    ip-10-4-54-135.ec2.internal running \
+# berto   0       m1.small    2012-12-01T02:28:30+0000    us-east-1c  aki-427d952 \
+# monitoring-disabled 23.22.46.174    10.4.54.135         instance-store
+EC2_DESCRIBE_INSTANCES_RE = re.compile(r'INSTANCE\s+(?P<instance_id>\S+)\s+(?P<ami_id>\S+)\s+(?P<ec2_hostname>\S+)\s+(?P<ec2_private_hostname>\S+)\s+(?P<running_state>\S+).*')
+EC2_DESCRIBE_INSTANCES = sh.Command('ec2-describe-instances')
+
+# INSTANCE  i-91e9e4ee  ami-1db20274            pending berto   0       m1.small    2012-12-01T01:55:17+0000 \
+# us-east-1d  aki-427d952b            monitoring-disabled             
+EC2_RUN_INSTANCES_RE = re.compile(r'INSTANCE\s+(?P<instance_id>\S+).*')
+EC2_RUNNING_STATE = 'running'
+
+# ec2-run-instances ami-1db20274 -t m1.small --region us-east-1 --key ${EC2_KEYPAIR_US_EAST_1}
+EC2_RUN_INSTANCES = sh.Command('ec2-run-instances')
+
+SSH_KEY_NAME = 'EC2_MY_SSH_KEY'
+SSH_KEY = os.environ.get('EC2_MY_SSH_KEY')
+
+SSH_ARGS = ('-o', 'UserKnownHostsFile /dev/null', '-o', 'StrictHostKeyChecking no', '-i', SSH_KEY, '-l', 'ubuntu')
+
+CURRENT_BRANCH = os.path.basename(str(sh.git('symbolic-ref', 'HEAD'))).strip()
+CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
+
+EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bin/appscale-bootstrap-ec2')
+
+BOOTSTRAP_DOWNLOADER = os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader')
+
+
+class Bootstrap(Command):
+    """
+    Bootstrap AppScale on an EC2 environment
+    """
+    def __init__(self, doc=None):
+        self.ec2_hostname = None
+
+        super(Bootstrap, self).__init__(doc=doc)
+
+        self.instance_id = None
+        self.instance_type = 'm1.small'
+
+        # use the ssh property instead of this directly.
+        self._ssh = None
+
+    def _fill_parser(self):
+        super(Bootstrap, self)._fill_parser()
+
+        self.parser.add_argument('instance_id', nargs='?', help='The ID of a running instance to provision')
+
+    def _check_ssh_key(self):
+        """
+        Ensure an SSH key is specified in the environment.
+
+        This is the SSH key that is injected into the VM in order to be able to
+        SSH into it.
+        """
+        if SSH_KEY is None:
+            message = (
+                "{0} Please set the {1} environment "
+                "variable with the SSH key EC2 should use."
+            ).format(colored.red('Error:'), colored.yellow(SSH_KEY_NAME))
+
+            raise self.CommandError(message)
+
+    def install_appscale(self):
+        """
+        SSH into the VM and install AppScale
+        """
+
+        tmp_downloader = os.path.join('/tmp', os.path.basename(BOOTSTRAP_DOWNLOADER))
+        remote_command = 'cat > {path} && bash {path} {url}'.format(
+                path=tmp_downloader, url=EC2_BOOTSTRAP_SCRIPT)
+
+        for line in self.ssh(cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
+            sys.stdout.write(line)
+            sys.stdout.flush()
+
+    @property
+    def key_name(self):
+        return os.path.basename(SSH_KEY).replace('id_', '')
+
+    def run(self):
+        self._check_ssh_key()
+
+        self.instance_id = self.start_instance()
+        puts('instance id: {0}'.format(self.instance_id))
+
+        self.wait_for_instance()
+
+        self.install_appscale()
+
+    @property
+    def ssh(self):
+        if self._ssh is not None:
+            return self._ssh
+
+        if self.ec2_hostname is None:
+            raise self.CommandError('Cannot run SSH without a hostname')
+
+        self._ssh = ssh.bake(SSH_ARGS + (self.ec2_hostname,))
+        self.logger.debug('SSH command: {0}'.format(str(self._ssh)))
+
+        return self._ssh
+
+    def start_instance(self):
+        """
+        Use ec2-run-instances to create a VM on EC2
+        """
+
+        instance_id = self.arguments.instance_id
+        if instance_id:
+            return instance_id
+
+        for line in EC2_RUN_INSTANCES(
+                AMIS[self.instance_type], '-v', '-n', '1', '-t', self.instance_type, '-k', self.key_name, _iter=True):
+            matches = EC2_RUN_INSTANCES_RE.match(line)
+            if matches:
+                instance_id = matches.group('instance_id')
+
+        if instance_id is None:
+            raise self.CommandError('Did not find instance id')
+
+        return instance_id
+
+    def wait_for_instance(self):
+        """
+        Wait for an instance to go from pending to running.
+
+        This will wait a maximum of 5 minutes and error out
+        """
+
+        running_state = None
+        now = time.time()
+        describe_instances_info = None
+
+        while time.time() < now + 300:
+            t_running_state = None
+
+            for line in EC2_DESCRIBE_INSTANCES(self.instance_id, _iter=True):
+                matches = EC2_DESCRIBE_INSTANCES_RE.match(line)
+                if matches:
+                    t_running_state = matches.group('running_state')
+
+            if t_running_state is None:
+                raise self.CommandError('failed to parse ec2-describe-instances output')
+            else:
+                running_state = t_running_state
+
+            if running_state == EC2_RUNNING_STATE:
+                describe_instances_info = matches.groupdict()
+                break
+
+            self.logger.debug('instance {0} in state {1}, waiting ...'.format(self.instance_id, running_state))
+            time.sleep(2.0)
+
+        if running_state != EC2_RUNNING_STATE:
+            raise self.CommandError('EC2 instance is in running state {0} instead of {1}'.format(running_state, EC2_RUNNING_STATE))
+
+        # set the ec2_hostname from the last regex match
+        self.ec2_hostname = describe_instances_info['ec2_hostname']
+
+
+run_command(__name__, Bootstrap)
