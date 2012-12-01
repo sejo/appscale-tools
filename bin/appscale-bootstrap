@@ -145,8 +145,6 @@ class Bootstrap(Command):
         self.instance_id = self.start_instance()
         self.logger.info('instance id: {0}'.format(self.instance_id))
 
-        self.wait_for_instance()
-
         self.install_appscale()
 
         self.stop_instance()
@@ -188,6 +186,8 @@ class Bootstrap(Command):
 
         if instance_id is None:
             raise self.CommandError('Did not find instance id')
+
+        self.wait_for_instance()
 
         return instance_id
 
