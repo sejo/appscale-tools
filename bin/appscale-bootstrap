@@ -187,7 +187,7 @@ class Bootstrap(Command):
         if instance_id is None:
             raise self.CommandError('Did not find instance id')
 
-        self.wait_for_instance()
+        self.wait_for_instance(instance_id=instance_id)
 
         return instance_id
 
@@ -197,7 +197,7 @@ class Bootstrap(Command):
 
         self.wait_for_instance(desired_state=EC2_STOPPED_STATE)
 
-    def wait_for_instance(self, desired_state=EC2_RUNNING_STATE):
+    def wait_for_instance(self, instance_id=None, desired_state=EC2_RUNNING_STATE):
         """
         Wait for an instance to go from pending to running.
 
@@ -208,10 +208,12 @@ class Bootstrap(Command):
         now = time.time()
         describe_instances_info = None
 
+        instance_id = instance_id or self.instance_id
+
         while time.time() < now + 300:
             t_running_state = None
 
-            for line in EC2_DESCRIBE_INSTANCES(self.instance_id, _iter=True):
+            for line in EC2_DESCRIBE_INSTANCES(instance_id, _iter=True):
                 matches = EC2_DESCRIBE_INSTANCES_RE.match(line)
                 if matches:
                     t_running_state = matches.group('running_state')
@@ -227,7 +229,7 @@ class Bootstrap(Command):
                 break
 
             self.logger.debug('instance {0} in {1} state, waiting for {2} state.'.format(
-                self.instance_id, running_state, desired_state)
+                instance_id, running_state, desired_state)
             )
 
             time.sleep(2.0)
