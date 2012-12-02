@@ -103,8 +103,18 @@ class Bootstrap(Command):
 
         ec2_create_image = sh.Command('ec2-create-image')
 
+        image_id = None
         for line in ec2_create_image(self.instance_id, '-n', image_name, _iter=True):
-            self.logger.info(line)
+            line = line.strip()
+
+            if line.startswith('IMAGE'):
+                image_id = line.split()[1] #e.g. ami-359a1a5c
+
+        if image_id is None:
+            raise self.CommandError('Unable to get image id from ec2-create-image')
+
+        self.image_id = image_id
+        self.logger.info('image_id: {0}'.format(self.image_id))
 
     def install_appscale(self):
         """
