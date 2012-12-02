@@ -134,7 +134,7 @@ class appscale {
   }
 
   exec { "add_appscale_key_to_apt":
-    command => "gpg --export 'AppScale Releases' | apt-key add -",
+    command => "curl http://apt.appscale.com/appscale_releases.pub.gpg | apt-key add -",
     unless => "sudo apt-key list | grep AppScale",
   }
 }
