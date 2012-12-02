@@ -36,6 +36,7 @@ class appscale_dependencies {
   exec { "install_pip":
     command => "easy_install pip",
     unless => "which pip",
+    require => Package["python-setuptools"],
   }
 
   exec { "install_virtualenvwrapper":
@@ -69,6 +70,7 @@ class appscale_development {
   exec { "appscale_tools_venv":
     command => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && mkvirtualenv appscale-tools'",
     unless => "bash -c 'export WORKON_HOME=/var/lib/appscale/virtualenvs; source /usr/local/bin/virtualenvwrapper.sh && workon appscale-tools'",
+    require => Exec["install_virtualenvwrapper"],
   }
 
   exec { "install python requirements":
@@ -80,6 +82,7 @@ class appscale_development {
   exec { "check install appscale-tools package":
     cwd => "/tmp",
     command => "echo hi",
+    require => Exec["install python requirements"],
     before => Exec["set_appscale_tools_venv_permissions"],
     notify => Exec["install appscale-tools package"],
     unless => "/var/lib/appscale/virtualenvs/appscale-tools/bin/python -c 'from appscaletools import ec2'",
