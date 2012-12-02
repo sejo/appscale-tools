@@ -5,6 +5,11 @@ class box_cleanup {
     command => "sed -i -e 's/127.0.1.1.*/127.0.1.1 lucid64/' /etc/hosts",
     onlyif => "grep comcast /etc/hosts",
   }
+
+  # set the VM to be UTC
+  file { "/etc/localtime":
+    ensure => absent,
+  }
 }
 
 class appscale_dependencies {
