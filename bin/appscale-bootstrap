@@ -3,6 +3,7 @@
 import os
 import sh
 import string
+import sys
 import time
 
 from clint.command import Command, run_command
@@ -39,9 +40,15 @@ SSH_KEY = os.environ.get('EC2_MY_SSH_KEY')
 
 SSH_ARGS = ('-o', 'UserKnownHostsFile /dev/null', '-o', 'StrictHostKeyChecking no', '-i', SSH_KEY, '-l', 'ubuntu')
 
-CURRENT_BRANCH = os.path.basename(str(sh.git('symbolic-ref', 'HEAD'))).strip()
-CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
+# In order to find the bootstrap files, this command uses git and the branch to
+# know how to find it.  Because of this, require the user to be in the repo.
+# TODO: this should simply default to the master branch and have a hardcoded URL.
+try:
+    CURRENT_BRANCH = os.path.basename(str(sh.git('symbolic-ref', 'HEAD'))).strip()
+except sh.ErrorReturnCode_128:
+    sys.exit("For the time being, please run this command within the appscale-tools git repository")
 
+CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
 EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bootstrap/appscale-bootstrap-ec2')
 
 BOOTSTRAP_DOWNLOADER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader'))
