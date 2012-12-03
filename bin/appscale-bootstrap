@@ -226,6 +226,9 @@ class Bootstrap(Command):
 
         instance_id = self.arguments.instance_id
         if instance_id:
+            # call wait_for_instance() in order to get hostname
+            self.wait_for_instance(instance_id=instance_id)
+
             return instance_id
 
         for line in EC2_RUN_INSTANCES(
