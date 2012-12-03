@@ -28,7 +28,7 @@ Configure credentials
 
 Vagrant will automatically create and share the ``~/.appscale-tools``
 configuration directory with the VM so that it has access to your EC2
-credentials.  Create the file ``~/.sppscale-tools/appscale_config.sh`` with the
+credentials.  Create the file ``~/.appscale-tools/appscale_config.sh`` with the
 following content (filling in your personal information, of course)::
 
     export EC2_ACCESS_KEY='{{ your key here }}'
@@ -46,6 +46,32 @@ information is displayed when using the command::
 If you are already logged into the system, you may have to logout and back in.
 Alternatively, you can manually source the file using the command ``source
 ~/.appscale-tools/appscale_config.sh``
+
+Confirm EC2 Tools are working
+-----------------------------
+
+Confirm EC2 Tools are working by running the command::
+
+    ec2-describe-instances
+
+Create an EC2 SSH key
+---------------------
+
+With a working EC2 environment, you can create an SSH key that will be used to
+SSH into any EC2 instances created.  Run the following command substituting
+your name below::
+
+    ec2-add-keypair <your name> >> ~/.appscale-tools/id_<your name>
+
+For example::
+
+    ec2-add-keypair berto >> ~/.appscale-tools/id_berto
+
+Now, update ``~/.appscale-tools/appscale_config.sh`` with the following entry::
+
+    export EC2_MY_SSH_KEY=~/.appscale-tools/id_<your nae>
+
+Your system is now configured!
 
 .. _VirtualBox: http://virtualbox.org/
 __ VirtualBox_

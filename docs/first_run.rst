@@ -1,50 +1,33 @@
 First Run
 =========
 
-Once you've completed all the Getting Started steps, confirm EC2 tools are working by running the command::
+With a configured EC2 Tools environment, now it's time to create an AppScale image.
 
-    ec2-describe-instances
+If not already there, SSH into the Vagrant box::
 
-cd /root
+    vagrant ssh
 
+Then go into the appscale-tools repository::
 
-``appscale-run-instances`` [with flags] - fires up a cloud
+    cd /srv/appscale/repo/appscale-tools
 
-    ec2-run-instances -t m1.large -n 1 -k mykeyname ami-67b202ae
-    ec2-describe-instances | grep mykeyname
+From here you can bootstrap the image creation process using the command::
 
-Take a snapshot and make a personal AMI::
+    ./bin/appscale-bootstrap
 
-    ec2-create-image -n cjkASAMI i-ID
+For more information on this command simply run it with the ``-h`` flag::
 
-    # to see the status (pending -> available)
-    ec2-describe-images -o self
+    ./bin/appscale-bootstrap -h
 
-    ec2-terminate-instances i-ID
+This command will take a while to run.  Once it's complete, you will see in the
+last few lines of the log the instance id and the image id that was created.
 
-http://code.google.com/p/appscale/wiki/ImageSetupViaBzr
+NOTE: The bootstrap script does not currently terminate the instance that is
+created in order to make an AppScale image.  Please terminate it once you are
+done.
 
+Create an AppScale Cluster
+--------------------------
 
-It's possible to start appscale by defining an app (clone the sample-apps repo and cd in to the python directory) on the command line, or starting a cloud and then uploading an app.
+``appscale-run-instances`` [with flags] - fires up a cluster
 
-Pre-baked AppScale AMI: ami-52912a3b
-
-Use ``--test`` to set the credentials to ``a@a.a`` and password ``aaaaaa``
-
-Without app:: 
-
-    AMI=ami-52912a3b
-    appscale-run-instances --infrastructure ec2 --keyname appscaleXXX --min 1 --max 1 --machine ${AMI} -v  # the keyname should be a new keyname, not one you?ve used or created previously
-
-Now upload an app::
-
-    cd ${APPSCALE_SAMPLE_APPS}/python
-    appscale-upload-app --keyname appscaleXXX --file guestbook # guestbook is the best supported app ATM
-
-Defining an app::
-
-    appscale-run-instances --infrastructure ec2 --keyname appscaleXXX --min 1 --max 1 --machine ami-ddbb3cb4 --file guestbook -v
-
-When you're done::
-
-    appscale-terminate-instances --keyname appscaleXXX
