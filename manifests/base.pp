@@ -1,4 +1,7 @@
-Exec { path => ["/usr/bin", "/usr/local/bin", "/usr/sbin", "/bin", "/sbin"] }
+Exec {
+  path => ["/usr/bin", "/usr/local/bin", "/usr/sbin", "/bin", "/sbin"],
+  logoutput => "on_failure",
+}
 
 class box_cleanup {
   exec { "fix_hosts":
