@@ -41,7 +41,7 @@ build:
 	install -m 0644 etc/profile.d/appscale_tools.sh build/etc/profile.d/appscale_tools.sh
 	install -m 0644 etc/profile.d/appscale_config.sh build/etc/profile.d/appscale_config.sh
 
-P ?= appscaletools
+f ?= appscaletools
 .PHONY: pylint
 pylint:
-	PYTHONPATH=lint pylint --load-plugins astng_sh $(P)
+	PYTHONPATH=lint pylint --rcfile=files/etc/pylintrc --load-plugins astng_sh $(f)
