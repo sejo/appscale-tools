@@ -24,6 +24,27 @@ Ubuntu 10.04 Lucid 64-bit box::
 
     vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
 
+Clone the AppScale Tools repository
+-----------------------------------
+
+Vagrant is configured to automatically mount ``~/Appscale`` as
+``/srv/appscale`` on the VM, and look for the ``appscale-tools`` repo at
+``/srv/appscale/repo/appscale-tools``.  At the moment there are some
+limitations with the Puppet manifest script that require hard-coded absolute
+paths.
+
+Clone the repository in ``~/Appscale/repo`` on your computer::
+
+    mkdir -p ~/Appscale/repo
+    cd ~/Appscale/repo
+    git clone https://github.com/AppScale/appscale-tools.git
+    cd appscale-tools
+
+Currently this documentation reflects the changes in the
+``auto_appscale_install`` branch, so switch to that branch::
+
+    git checkout auto_appscale_install
+
 Launching a development VM
 --------------------------
 
