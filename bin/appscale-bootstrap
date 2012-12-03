@@ -17,37 +17,10 @@ from clint.command import Command, run_command
 from clint.textui import colored
 from sh import ssh
 
-from debgit.branch import get_upstream_for_branch
-
 from appscaletools.ec2 import EC2_DESCRIBE_INSTANCES, EC2_DESCRIBE_INSTANCES_RE, EC2_RUNNING_STATE, \
     EC2_RUN_INSTANCES_RE, EC2_STOPPED_STATE
 
-def get_script_url(base, branch, file_path):
-    """
-    Generate a URL from the given components.
-
-    If the URL happens to be github.com, convert it to raw.github.com
-    """
-
-    if '/github.com' in base:
-        base = base.replace('github.com', 'raw.github.com')
-
-    return '{0}/{1}{2}'.format(base, branch, file_path)
-
-def ssh_key_name():
-    """
-    Return the name of the SSH key.
-
-    If there is an 'id_' prefix, it will be removed.
-    """
-    return os.path.basename(SSH_KEY).replace('id_', '')
-
-
-# official Ubuntu EBS-backed AMI so it can be imaged
-#AMI = 'ami-c7b202ae'
-
-# AppScale Lucid AMI that has been upgraded and has git installed
-AMI = 'ami-d59818bc'
+AMI = 'ami-c7b202ae' # official Ubuntu EBS-backed AMI to be imaged
 DEFAULT_INSTANCE_TYPE = 'm1.small'
 
 # ec2-run-instances ami-1db20274 -t m1.small --region us-east-1 --key ${EC2_KEYPAIR_US_EAST_1}
@@ -58,19 +31,48 @@ SSH_KEY = os.environ.get('EC2_MY_SSH_KEY')
 
 SSH_ARGS = ('-o', 'UserKnownHostsFile /dev/null', '-o', 'StrictHostKeyChecking no', '-i', SSH_KEY, '-l', 'ubuntu')
 
-# In order to find the bootstrap files, this command uses git and the branch to
-# know how to find it.  Because of this, require the user to be in the repo.
-# TODO: this should simply default to the master branch and have a hardcoded URL.
-try:
-    CURRENT_BRANCH = os.path.basename(str(sh.git('symbolic-ref', 'HEAD'))).strip()
-except sh.ErrorReturnCode_128:
-    sys.exit("For the time being, please run this command within the appscale-tools git repository")
+BOOTSTRAP_RELATIVE_PATH = os.path.join('bootstrap', 'appscale-bootstrap-ec2')
+SYSTEM_BOOTSTRAP_PATH = os.path.join(sys.prefix, 'share', BOOTSTRAP_RELATIVE_PATH)
 
-CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
-EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bootstrap/appscale-bootstrap-ec2')
+# confirm we are in the AppScale Tools repo.
+def in_appscale_tools_repo():
+    """
+    Check if command is running from an AppScale Tools repo.
+    """
 
-BOOTSTRAP_DOWNLOADER = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader'))
+    in_repo = False
+    try:
+        for line in sh.git('remote', '-v', _iter=True):
+            if 'appscale-tools.git' in line:
+                in_repo = True
+                break
+    except sh.ErrorReturnCode_128:
+        pass
+
+    return in_repo
+
+def get_bootstrap_path():
+    """
+    Return the bootstrap script's path.
+
+    When appscale-bootstrap is run from a repository, return the path in the
+    repo.  Otherwise, return the one installed on the system.
+    """
+    if in_appscale_tools_repo():
+        path = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '..', BOOTSTRAP_RELATIVE_PATH))
+    else:
+        path = SYSTEM_BOOTSTRAP_PATH
+
+    return path
+
+def ssh_key_name():
+    """
+    Return the name of the SSH key.
+
+    If there is an 'id_' prefix, it will be removed.
+    """
+    return os.path.basename(SSH_KEY).replace('id_', '')
 
 
 class Bootstrap(Command):
@@ -152,11 +154,12 @@ class Bootstrap(Command):
         SSH into the VM and install AppScale
         """
 
-        tmp_downloader = os.path.join('/tmp', os.path.basename(BOOTSTRAP_DOWNLOADER))
-        remote_command = 'cat > {path} && bash {path} {url}'.format(
-                path=tmp_downloader, url=EC2_BOOTSTRAP_SCRIPT)
+        bootstrap_path = get_bootstrap_path()
 
-        self.logger.debug('Catting downloader from {0}'.format(BOOTSTRAP_DOWNLOADER))
+        bootstrap = os.path.join('/tmp', os.path.basename(bootstrap_path))
+        remote_command = 'cat > {path} && sudo bash {path}'.format(path=bootstrap)
+
+        self.logger.debug('Catting bootstrap from {0}'.format(bootstrap_path))
         self.logger.debug('Remote command: {0}'.format(remote_command))
 
         # attempt to get an SSH connection up to 5 times because we might try
@@ -164,7 +167,7 @@ class Bootstrap(Command):
         success = False
         for _ in range(5):
             try:
-                for line in self.ssh(sh.cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
+                for line in self.ssh(sh.cat(bootstrap_path), remote_command, _iter=True):
                     log_line = ''.join(s for s in line.strip() if s in string.printable)
                     self.logger.info(log_line)
 
