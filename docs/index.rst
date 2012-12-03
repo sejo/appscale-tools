@@ -13,6 +13,7 @@ Contents:
 
    getting_started
    first_run
+   development
    packaging
 
 Indices and tables
