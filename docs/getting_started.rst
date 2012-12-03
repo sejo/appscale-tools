@@ -79,7 +79,11 @@ Now, update ``~/.appscale-tools/appscale_config.sh`` with the following entry::
 
     export EC2_MY_SSH_KEY=~/.appscale-tools/id_<your nae>
 
-Your system is now configured!
+Your system is now configured!  Note that even if you destroy this VM, you will
+not need to re-configure the system.  These configuration files are kept in
+your host machine's home directory under ``~/.appscale-tools``.  You can run
+``vagrant destroy``, followed by ``vagrant up`` and you'll be ready to run
+instantly.
 
 .. _VirtualBox: http://virtualbox.org/
 __ VirtualBox_
