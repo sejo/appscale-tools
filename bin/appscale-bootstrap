@@ -170,8 +170,8 @@ class Bootstrap(Command):
 
                 success = True
                 break
-            except sh.ErrorReturnCode:
-                self.logger.error('SSH failure?  Trying again in 5 seconds.')
+            except sh.ErrorReturnCode_255, exc:
+                self.logger.error('Error (SSH failure?): Trying again in 5 seconds.'.format(exc.__class__))
                 time.sleep(5.0)
 
         if not success:
