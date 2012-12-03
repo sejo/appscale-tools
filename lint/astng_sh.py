@@ -10,6 +10,7 @@ class sh(object):
 class git(sh):
     def strip(*args, **kwargs): pass
 class ssh(sh): pass
+class ErrorReturnCode_255(Exception): pass
 """
 
 def sh_transform(module):
