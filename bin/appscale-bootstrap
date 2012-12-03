@@ -193,9 +193,7 @@ class Bootstrap(Command):
 
         self.create_image()
 
-        # TODO: check to see if creating an image needs the instance to be
-        # alive, or is it possible to terminate the instance immediately?
-        #self.terminate_instance()
+        self.terminate_instance()
 
         now = time.time()
         elapsed = now - start
