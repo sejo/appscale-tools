@@ -1,8 +1,18 @@
+"""
+EC2 specific variables and helpers.
+"""
+
 import re
 
 import sh
 
-EC2_DESCRIBE_INSTANCES_RE = re.compile(r'INSTANCE\s+(?P<instance_id>\S+)\s+(?P<ami_id>\S+)\s+(?P<ec2_hostname>\S+amazonaws\.com)?\s*(?P<ec2_private_hostname>\S+\.internal)?\s*(?P<running_state>\S+).*')
+EC2_DESCRIBE_INSTANCES_RE = re.compile((
+    r'INSTANCE\s+(?P<instance_id>\S+)\s+'
+    r'(?P<ami_id>\S+)\s+'
+    r'(?P<ec2_hostname>\S+amazonaws\.com)?\s*'
+    r'(?P<ec2_private_hostname>\S+\.internal)?\s*'
+    r'(?P<running_state>\S+).*'
+))
 EC2_DESCRIBE_INSTANCES = sh.Command('ec2-describe-instances')
 
 EC2_RUN_INSTANCES_RE = re.compile(r'INSTANCE\s+(?P<instance_id>\S+).*')
