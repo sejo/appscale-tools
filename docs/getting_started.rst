@@ -16,6 +16,14 @@ Make sure you have Ruby and Rubygems support.  Then, from the command line, run:
 
     gem install vagrant
 
+Downloading the base box
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Vagrant uses a base box to create VMs.  Run the command below to download an
+Ubuntu 10.04 Lucid 64-bit box::
+
+    vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
+
 Launching a development VM
 --------------------------
 
