@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+# tell pylint to ignore the filename containing a dash.  This is intentional to
+# maintain convention with ec2-tools, euca-tools, appscale-tools, etc.
+# pylint: disable=C0103
 """
 Script for automating the process of creating an AppScale image on EC2
 """
