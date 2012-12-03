@@ -31,6 +31,7 @@ def get_script_url(base, branch, file_path):
 
 # AppScale Lucid AMI that has been upgraded and has git installed
 AMI = 'ami-d59818bc'
+DEFAULT_INSTANCE_TYPE = 'm1.small'
 
 # ec2-run-instances ami-1db20274 -t m1.small --region us-east-1 --key ${EC2_KEYPAIR_US_EAST_1}
 EC2_RUN_INSTANCES = sh.Command('ec2-run-instances')
@@ -74,13 +75,15 @@ class Bootstrap(Command):
         super(Bootstrap, self).__init__(doc=doc)
 
         self.instance_id = None
-        self.instance_type = 'm1.small'
 
         # use the ssh property instead of this directly.
         self._ssh = None
 
     def _fill_parser(self):
         super(Bootstrap, self)._fill_parser()
+
+        self.parser.add_argument('-t', '--instance-type', default=DEFAULT_INSTANCE_TYPE,
+                                 help='The EC2 instance type; default: {0}'.format(DEFAULT_INSTANCE_TYPE))
 
         self.parser.add_argument('instance_id', nargs='?', help='The ID of a running instance to provision')
 
@@ -205,7 +208,7 @@ class Bootstrap(Command):
             return instance_id
 
         for line in EC2_RUN_INSTANCES(
-                AMI, '-v', '-n', '1', '-t', self.instance_type, '-k', self.key_name, _iter=True):
+                AMI, '-v', '-n', '1', '-t', self.arguments.instance_type, '-k', self.key_name, _iter=True):
             matches = EC2_RUN_INSTANCES_RE.match(line)
             if matches:
                 instance_id = matches.group('instance_id')

@@ -15,7 +15,7 @@ class box_cleanup {
 class appscale_dependencies {
   exec { "apt-get update": }
 
-  package { ["build-essential", "debhelper", "dh-make", "dupload", "fakeroot", "lintian", "gnupg", "pbuilder",
+  package { ["build-essential", "debhelper", "dh-make", "dupload", "fakeroot", "lintian", "gnupg", "pbuilder", "tmux",
              "ec2-ami-tools", "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx", "python-setuptools"]:
     ensure => present,
     require => Exec["apt-get update"],
