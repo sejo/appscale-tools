@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+"""
+Script for automating the process of creating an AppScale image on EC2
+"""
+
 import os
 import sh
 import string
@@ -7,12 +11,13 @@ import sys
 import time
 
 from clint.command import Command, run_command
-from clint.textui import colored, puts
+from clint.textui import colored
 from sh import ssh
 
 from debgit.branch import get_upstream_for_branch
 
-from appscaletools.ec2 import *
+from appscaletools.ec2 import EC2_DESCRIBE_INSTANCES, EC2_DESCRIBE_INSTANCES_RE, EC2_RUNNING_STATE, \
+    EC2_RUN_INSTANCES_RE, EC2_STOPPED_STATE
 
 def get_script_url(base, branch, file_path):
     """
@@ -52,7 +57,8 @@ except sh.ErrorReturnCode_128:
 CURRENT_BRANCH_UPSTREAM = get_upstream_for_branch(CURRENT_BRANCH)
 EC2_BOOTSTRAP_SCRIPT = get_script_url(CURRENT_BRANCH_UPSTREAM, CURRENT_BRANCH, '/bootstrap/appscale-bootstrap-ec2')
 
-BOOTSTRAP_DOWNLOADER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader'))
+BOOTSTRAP_DOWNLOADER = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..', 'bootstrap', 'bootstrap_downloader'))
 
 
 class Bootstrap(Command):
@@ -75,6 +81,7 @@ class Bootstrap(Command):
         super(Bootstrap, self).__init__(doc=doc)
 
         self.instance_id = None
+        self.image_id = None
 
         # use the ssh property instead of this directly.
         self._ssh = None
@@ -141,7 +148,7 @@ class Bootstrap(Command):
         # attempt to get an SSH connection up to 5 times because we might try
         # to connect to the machine while it's still trying to boot.
         success = False
-        for try_num in range(5):
+        for _ in range(5):
             try:
                 for line in self.ssh(sh.cat(BOOTSTRAP_DOWNLOADER), remote_command, _iter=True):
                     log_line = ''.join(s for s in line.strip() if s in string.printable)
@@ -158,6 +165,11 @@ class Bootstrap(Command):
 
     @property
     def key_name(self):
+        """
+        Return the name of the SSH key.
+
+        If there is an 'id_' prefix, it will be removed.
+        """
         return os.path.basename(SSH_KEY).replace('id_', '')
 
     def run(self):
@@ -188,6 +200,11 @@ class Bootstrap(Command):
 
     @property
     def ssh(self):
+        """
+        Return an SSH command object.
+
+        This will bake needed arguments for connecting to the EC2 instance.
+        """
         if self._ssh is not None:
             return self._ssh
 
@@ -222,12 +239,20 @@ class Bootstrap(Command):
         return instance_id
 
     def stop_instance(self):
+        """
+        Wrapper around ec2-stop-instances.
+        """
+
         ec2_stop_instances = sh.Command('ec2-stop-instances')
         ec2_stop_instances(self.instance_id)
 
         self.wait_for_instance(desired_state=EC2_STOPPED_STATE)
 
     def terminate_instance(self):
+        """
+        Wrapper around ec2-terminate-instances
+        """
+
         self.logger.info('Terminating instance {0}'.format(self.instance_id))
 
         ec2_terminate_instances = sh.Command('ec2-terminate-instances')
@@ -272,7 +297,8 @@ class Bootstrap(Command):
             time.sleep(2.0)
 
         if running_state != desired_state:
-            raise self.CommandError('EC2 instance is in running state {0} instead of {1}'.format(running_state, desired_state))
+            message = 'EC2 instance is in running state {0} instead of {1}'.format(running_state, desired_state)
+            raise self.CommandError(message)
 
         # if the machine's state is running, grab the hostname, otherwise clear it
         if running_state == EC2_RUNNING_STATE:
