@@ -99,7 +99,9 @@ class Bootstrap(Command):
         self._ssh = None
 
     def _fill_parser(self):
+        # pylint: disable=W0212
         super(Bootstrap, self)._fill_parser()
+        # pylint: enable=W0212
 
         self.parser.add_argument('-t', '--instance-type', default=DEFAULT_INSTANCE_TYPE,
                                  help='The EC2 instance type; default: {0}'.format(DEFAULT_INSTANCE_TYPE))
