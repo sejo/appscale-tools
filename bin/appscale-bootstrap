@@ -205,6 +205,8 @@ class Bootstrap(Command):
         elapsed = now - start
 
         self.logger.info('Done.  Elapsed time: {0}s'.format(elapsed))
+        self.logger.info(
+                'When you are done with the AMI, you run the command: ec2-deregister {0}'.format(self.image_id))
 
     @property
     def ssh(self):
