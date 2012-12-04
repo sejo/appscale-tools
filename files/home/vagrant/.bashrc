@@ -105,5 +105,3 @@ venv_wrapper=/usr/local/bin/virtualenvwrapper_lazy.sh
 
 appscale_tools_venv=${WORKON_HOME}/appscale-tools
 [ -e ${appscale_tools_venv} ] && workon $(basename ${appscale_tools_venv})
-
-alias repo='cd /srv/appscale/repo'
