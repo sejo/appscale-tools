@@ -50,7 +50,14 @@ Launching a development VM
 
 Once the prerequisites are installed, simply run ``vagrant up`` to setup the
 environment, followed by ``vagrant ssh`` to connect to the VM.  The repository
-is mounted inside the VM at ``/home/vagrant/appscale/appscale-tools``.
+is mounted inside the VM at ``/srv/appscale/appscale-tools``.
+
+The ``repo`` command
+~~~~~~~~~~~~~~~~~~~~
+
+AppScale Tools includes a ``repo`` command which makes it easy to switch to
+repositories.  Type ``repo`` and double tab to see a list of repositories in
+the ``/srv/appscale/repo`` directory.
 
 Configure credentials
 ---------------------
@@ -58,14 +65,23 @@ Configure credentials
 Vagrant will automatically create and share the ``~/.appscale-tools``
 configuration directory with the VM so that it has access to your EC2
 credentials.  Create the file ``~/.appscale-tools/appscale_config.sh`` with the
-following content (filling in your personal information, of course)::
+following content (filling in your personal information, of course.  Do not
+include curly braces)::
 
     export EC2_ACCESS_KEY='{{ your key here }}'
     export EC2_SECRET_KEY='{{ your key here }}'
     export EC2_USER_ID='{{ your id here }}'
 
-Next, copy the AWS certificate and private key to
-``~/.appscale-tools/cert.pem`` and ``~/.appscale-tools/pk.pem`` respectively.
+Download AWS Credentials
+------------------------
+
+Download your account's certificate and private key or ask your administrator
+for IAM credentials.
+
+Next, copy the AWS certificate and private key::
+
+    cp <path to cert-*.pem> ~/.appscale-tools/cert.pem
+    cp <path to pk-*.pem> ~/.appscale-tools/pk.pem
 
 Once you SSH into the VM (``vagrant ssh``), confirm your personal
 information is displayed when using the command::
