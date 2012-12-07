@@ -137,7 +137,11 @@ class Bootstrap(Command):
         Create an image out of the instance that was just created
         """
 
-        image_name = 'appscale_cluster_{0}'.format(int(time.time()))
+        image_name = 'appscale_cluster-{now}-{owner}-{rev}'.format(
+                now=int(time.time()),
+                owner=ssh_key_name(),
+                rev=self.appscale_revision
+        )
 
         self.logger.info('creating image with name: {0}'.format(image_name))
 
