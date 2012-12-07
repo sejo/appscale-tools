@@ -21,6 +21,9 @@ from appscaletools.ec2 import EC2_DESCRIBE_INSTANCES, EC2_DESCRIBE_INSTANCES_RE,
     EC2_RUN_INSTANCES_RE, EC2_STOPPED_STATE
 
 
+DEFAULT_APPSCALE_BRANCH = 'testing'
+DEFAULT_APPSCALE_TOOLS_BRANCH = 'testing'
+
 AMI = 'ami-c7b202ae' # official Ubuntu EBS-backed AMI to be imaged
 DEFAULT_INSTANCE_TYPE = 'm1.small'
 
@@ -115,6 +118,20 @@ class Bootstrap(Command):
         self.parser.add_argument('-t', '--instance-type', default=DEFAULT_INSTANCE_TYPE,
                                  help='The EC2 instance type; default: {0}'.format(DEFAULT_INSTANCE_TYPE))
 
+        self.parser.add_argument(
+                '--appscale-branch',
+                default=DEFAULT_APPSCALE_BRANCH,
+                help=('Default AppScale branch to image; '
+                      'default: {0}').format(DEFAULT_APPSCALE_BRANCH)
+        )
+
+        self.parser.add_argument(
+                '--appscale-tools-branch',
+                default=DEFAULT_APPSCALE_TOOLS_BRANCH,
+                help=('Default AppScale Tools branch to image; '
+                      'default: {0}').format(DEFAULT_APPSCALE_TOOLS_BRANCH)
+        )
+
         self.parser.add_argument('instance_id', nargs='?', help='The ID of a running instance to provision')
 
     def _check_ssh_key(self):
@@ -168,7 +185,10 @@ class Bootstrap(Command):
         bootstrap_path = get_bootstrap_path()
 
         bootstrap = os.path.join('/tmp', os.path.basename(bootstrap_path))
-        remote_command = 'cat > {path} && sudo bash {path}'.format(path=bootstrap)
+        appscale_branch = self.arguments.appscale_branch
+        appscale_tools_branch = self.arguments.appscale_tools_branch
+        remote_command = ('cat > {0} && sudo bash {1} {2} {3}').format(
+                bootstrap, bootstrap, appscale_branch, appscale_tools_branch)
 
         self.logger.debug('Catting bootstrap from {0}'.format(bootstrap_path))
         self.logger.debug('Remote command: {0}'.format(remote_command))
