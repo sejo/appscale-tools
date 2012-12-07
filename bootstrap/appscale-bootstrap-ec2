@@ -15,9 +15,17 @@ cd /root
 # install AppScale
 git clone git://github.com/AppScale/appscale.git
 cd appscale
+
+echo "appscale branch: $(basename $(git symbolic-ref HEAD))"
+echo "appscale revision: $(git rev-parse --short HEAD)"
+
 bash debian/appscale_build.sh
 
 # install AppScale Tools
 git clone git://github.com/AppScale/appscale-tools.git
 cd appscale-tools
+
+echo "appscale-tools branch: $(basename $(git symbolic-ref HEAD))"
+echo "appscale-tools revision: $(git rev-parse --short HEAD)"
+
 bash debian/appscale_build.sh
