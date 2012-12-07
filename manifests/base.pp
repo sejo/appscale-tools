@@ -127,10 +127,15 @@ class appscale_tools {
     logoutput => "on_failure",
   }
 
+  exec { "remove_tools_deb":
+    command => "apt-get remove -y appscale-tools",
+    onlyif => "dpkg -l 'appscale-tools' | grep '^i'",
+  }
+
   exec { "install_appscale_tools":
-    command => "dpkg -i appscale-tools*deb",
+    command => "dpkg -i $(ls -1t appscale-tools*deb | head -n1)",
     cwd => "/srv/appscale/repo",
-    require => Exec["appscale_tools_deps"],
+    require => [Exec["appscale_tools_deps"], Exec["remove_tools_deb"]],
     logoutput => "on_failure",
   }
 }
