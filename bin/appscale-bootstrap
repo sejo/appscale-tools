@@ -20,6 +20,7 @@ from sh import ssh
 from appscaletools.ec2 import EC2_DESCRIBE_INSTANCES, EC2_DESCRIBE_INSTANCES_RE, EC2_RUNNING_STATE, \
     EC2_RUN_INSTANCES_RE, EC2_STOPPED_STATE
 
+
 AMI = 'ami-c7b202ae' # official Ubuntu EBS-backed AMI to be imaged
 DEFAULT_INSTANCE_TYPE = 'm1.small'
 
@@ -100,6 +101,9 @@ class Bootstrap(Command):
         # use the ssh property instead of this directly.
         self._ssh = None
 
+        self.appscale_branch = None
+        self.appscale_revision = None
+
     def _fill_parser(self):
         # pylint: disable=W0212
         super(Bootstrap, self)._fill_parser()
@@ -175,6 +179,14 @@ class Bootstrap(Command):
                     # build while some ruby / rubygems / gem was being
                     # installed.
                     log_line = ''.join(s for s in line.strip() if s in string.printable)
+
+                    # snag the branch and revision being built
+                    if log_line.startswith("appscale branch: "):
+                        self.appscale_branch = log_line.split()[1]
+
+                    if log_line.startswith("appscale revision: "):
+                        self.appscale_revision = log_line.split()[1]
+
                     self.logger.info(log_line)
 
                 success = True
