@@ -196,7 +196,7 @@ class Bootstrap(Command):
         # attempt to get an SSH connection up to 5 times because we might try
         # to connect to the machine while it's still trying to boot.
         success = False
-        for _ in range(5):
+        for _ in range(36):
             try:
                 for line in self.ssh(sh.cat(bootstrap_path), remote_command, _iter=True):
                     # rip out non-printable characters that were blowing up the
