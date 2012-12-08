@@ -206,10 +206,10 @@ class Bootstrap(Command):
 
                     # snag the branch and revision being built
                     if log_line.startswith("appscale branch: "):
-                        self.appscale_branch = log_line.split()[1]
+                        self.appscale_branch = log_line.split()[2]
 
                     if log_line.startswith("appscale revision: "):
-                        self.appscale_revision = log_line.split()[1]
+                        self.appscale_revision = log_line.split()[2]
 
                     self.logger.info(log_line)
 
