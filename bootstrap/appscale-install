@@ -21,6 +21,8 @@ echo "appscale revision: $(git rev-parse --short HEAD)"
 
 bash debian/appscale_build.sh
 
+cd /root
+
 # install AppScale Tools
 git clone git://github.com/AppScale/appscale-tools.git
 cd appscale-tools
