@@ -49,12 +49,35 @@ Currently this documentation reflects the changes in the
 
     git checkout auto_appscale_install
 
-Launching a development VM
+Configure AWS credentials
+-------------------------
+
+Create the AppScale Tools configuration directory::
+
+    mkdir ~/.appscale-tools
+
+Next, create the file ``~/.appscale-tools/appscale_config.sh`` with the
+following content (filling in your personal information, of course.  Do not
+include curly braces)::
+
+    export EC2_ACCESS_KEY='{{ your key here }}'
+    export EC2_SECRET_KEY='{{ your key here }}'
+    export EC2_USER_ID='{{ your id here }}'
+
+Finally, download your account's certificate and private key, or ask your
+administrator for IAM credentials, and copy the AWS certificate and private
+key::
+
+    cp <path to cert-*.pem> ~/.appscale-tools/cert.pem
+    cp <path to pk-*.pem> ~/.appscale-tools/pk.pem
+
+Launch a development VM
 --------------------------
 
-Once the prerequisites are installed, simply run ``vagrant up`` to setup the
-environment, followed by ``vagrant ssh`` to connect to the VM.  The repository
-is mounted inside the VM at ``/srv/appscale/repo/appscale-tools``.
+Once the prerequisites are installed and credentials configured, run the
+command ``vagrant up`` to setup the environment, followed by ``vagrant ssh`` to
+connect to the VM.  The repository is mounted inside the VM at
+``/srv/appscale/repo/appscale-tools``.
 
 The ``repo`` command
 ~~~~~~~~~~~~~~~~~~~~
@@ -65,41 +88,13 @@ space, and enter the ``tab`` key.  You will then see a list of available
 repositories in the ``/srv/appscale/repo`` directory.  Please see the
 `Wikipedia article on tab completion`_ for more information.
 
-Configure credentials
----------------------
-
-Vagrant will automatically create and share the ``~/.appscale-tools``
-configuration directory with the VM so that it has access to your EC2
-credentials.  Create the file ``~/.appscale-tools/appscale_config.sh`` with the
-following content (filling in your personal information, of course.  Do not
-include curly braces)::
-
-    export EC2_ACCESS_KEY='{{ your key here }}'
-    export EC2_SECRET_KEY='{{ your key here }}'
-    export EC2_USER_ID='{{ your id here }}'
-
-Download AWS Credentials
-------------------------
-
-Download your account's certificate and private key or ask your administrator
-for IAM credentials.
-
-Next, copy the AWS certificate and private key::
-
-    cp <path to cert-*.pem> ~/.appscale-tools/cert.pem
-    cp <path to pk-*.pem> ~/.appscale-tools/pk.pem
+Confirm EC2 Tools are working
+-----------------------------
 
 Once you SSH into the VM (``vagrant ssh``), confirm your personal
 information is displayed when using the command::
 
     echo $EC2_ACCESS_KEY
-
-If you are already logged into the system, you may have to logout and back in.
-Alternatively, you can manually source the file using the command ``source
-~/.appscale-tools/appscale_config.sh``
-
-Confirm EC2 Tools are working
------------------------------
 
 Confirm EC2 Tools are working by running the command::
 
