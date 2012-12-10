@@ -63,6 +63,7 @@ include curly braces)::
     export EC2_ACCESS_KEY='{{ your key here }}'
     export EC2_SECRET_KEY='{{ your key here }}'
     export EC2_USER_ID='{{ your id here }}'
+    export EC2_MY_SSH_KEY=~/.appscale-tools/id_{{ your username }}
 
 Finally, download your account's certificate and private key, or ask your
 administrator for IAM credentials, and copy the AWS certificate and private
@@ -106,17 +107,13 @@ Create an EC2 SSH key
 With a working EC2 environment, create an SSH key that will be used to SSH into
 EC2 instances.  Run the following commands substituting your name below::
 
-    ec2-add-keypair <your name> >> ~/.appscale-tools/id_<your name>
-    chmod 0600 ~/.appscale-tools/id_<your name>
+    ec2-add-keypair <your name> >> ~/.appscale-tools/id_<your username>
+    chmod 0600 ~/.appscale-tools/id_<your username>
 
 For example::
 
     ec2-add-keypair berto >> ~/.appscale-tools/id_berto
     chmod 0600 ~/.appscale-tools/id_berto
-
-Now, update ``~/.appscale-tools/appscale_config.sh`` with the following entry::
-
-    export EC2_MY_SSH_KEY=~/.appscale-tools/id_<your name>
 
 Your system is now configured!  Note that even if you destroy this VM, you will
 not need to re-configure the system.  These configuration files are kept in
