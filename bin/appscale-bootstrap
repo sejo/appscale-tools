@@ -35,7 +35,7 @@ SSH_KEY = os.environ.get('EC2_MY_SSH_KEY')
 
 SSH_ARGS = ('-o', 'UserKnownHostsFile /dev/null', '-o', 'StrictHostKeyChecking no', '-i', SSH_KEY, '-l', 'ubuntu')
 
-BOOTSTRAP_RELATIVE_PATH = os.path.join('bootstrap', 'appscale-bootstrap-ec2')
+BOOTSTRAP_RELATIVE_PATH = os.path.join('bootstrap', 'appscale-install')
 SYSTEM_BOOTSTRAP_PATH = os.path.join(sys.prefix, 'share', BOOTSTRAP_RELATIVE_PATH)
 
 # confirm we are in the AppScale Tools repo.
