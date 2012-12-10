@@ -4,6 +4,10 @@ Getting Started
 The quickest way to get started using AppScale Tools is using VirtualBox and
 Vagrant.
 
+Note, while the process below should work on any system that VirtualBox and
+Vagrant run on, this documentation was written while following the steps below
+on a Mac OS X system.
+
 Installing VirtualBox
 ---------------------
 
