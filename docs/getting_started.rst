@@ -56,8 +56,10 @@ The ``repo`` command
 ~~~~~~~~~~~~~~~~~~~~
 
 AppScale Tools includes a ``repo`` command which makes it easy to switch to
-repositories.  Type ``repo`` and double tab to see a list of repositories in
-the ``/srv/appscale/repo`` directory.
+repositories located in ``/srv/appscale/repo``.  Type ``repo``, followed by a
+space, and enter the ``tab`` key.  You will then see a list of available
+repositories in the ``/srv/appscale/repo`` directory.  Please see the
+`Wikipedia article on tab completion`_ for more information.
 
 Configure credentials
 ---------------------
@@ -124,3 +126,4 @@ instantly.
 
 .. _VirtualBox: http://virtualbox.org/
 __ VirtualBox_
+.. _Wikipedia article on tab completion: http://en.wikipedia.org/wiki/Command-line_completion
