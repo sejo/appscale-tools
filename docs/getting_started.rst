@@ -50,7 +50,7 @@ Launching a development VM
 
 Once the prerequisites are installed, simply run ``vagrant up`` to setup the
 environment, followed by ``vagrant ssh`` to connect to the VM.  The repository
-is mounted inside the VM at ``/srv/appscale/appscale-tools``.
+is mounted inside the VM at ``/srv/appscale/repo/appscale-tools``.
 
 The ``repo`` command
 ~~~~~~~~~~~~~~~~~~~~
