@@ -103,19 +103,20 @@ Confirm EC2 Tools are working by running the command::
 Create an EC2 SSH key
 ---------------------
 
-With a working EC2 environment, you can create an SSH key that will be used to
-SSH into any EC2 instances created.  Run the following command substituting
-your name below::
+With a working EC2 environment, create an SSH key that will be used to SSH into
+EC2 instances.  Run the following commands substituting your name below::
 
     ec2-add-keypair <your name> >> ~/.appscale-tools/id_<your name>
+    chmod 0600 ~/.appscale-tools/id_<your name>
 
 For example::
 
     ec2-add-keypair berto >> ~/.appscale-tools/id_berto
+    chmod 0600 ~/.appscale-tools/id_berto
 
 Now, update ``~/.appscale-tools/appscale_config.sh`` with the following entry::
 
-    export EC2_MY_SSH_KEY=~/.appscale-tools/id_<your nae>
+    export EC2_MY_SSH_KEY=~/.appscale-tools/id_<your name>
 
 Your system is now configured!  Note that even if you destroy this VM, you will
 not need to re-configure the system.  These configuration files are kept in
