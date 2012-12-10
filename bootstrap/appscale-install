@@ -16,6 +16,8 @@ cd /root
 git clone git://github.com/AppScale/appscale.git
 cd appscale
 
+[ ! -z $1 ] && git reset --hard origin/$1
+
 echo "appscale branch: $(basename $(git symbolic-ref HEAD))"
 echo "appscale revision: $(git rev-parse --short HEAD)"
 
@@ -26,6 +28,8 @@ cd /root
 # install AppScale Tools
 git clone git://github.com/AppScale/appscale-tools.git
 cd appscale-tools
+
+[ ! -z $2 ] && git reset --hard origin/$2
 
 echo "appscale-tools branch: $(basename $(git symbolic-ref HEAD))"
 echo "appscale-tools revision: $(git rev-parse --short HEAD)"
