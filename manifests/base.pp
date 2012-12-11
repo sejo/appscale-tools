@@ -72,6 +72,11 @@ class appscale_development {
     target => "/home/vagrant/.appscale-tools/devscripts",
   }
 
+  file { "/etc/profile.d/completion.sh":
+    ensure => present,
+    source => "/srv/appscale/repo/appscale-tools/etc/profile.d/completion.sh",
+  }
+
   file { "/etc/dupload.conf":
     ensure => present,
     source => "/srv/appscale/repo/appscale-tools/files/etc/dupload.conf",
