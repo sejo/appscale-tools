@@ -19,7 +19,8 @@ class appscale_dependencies {
   exec { "apt-get update": }
 
   package { ["build-essential", "debhelper", "dh-make", "dupload", "fakeroot", "lintian", "gnupg", "pbuilder", "tmux",
-             "ec2-ami-tools", "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx", "python-setuptools"]:
+             "ec2-ami-tools", "ec2-api-tools", "openjdk-6-jdk", "vim", "openssh-server", "git-core", "tcsh", "python-sphinx", "python-setuptools",
+             "appscale-rubygems", "ruby1.8-dev"]:
     ensure => present,
     require => Exec["apt-get update"],
     before => [File["/usr/lib/jvm/java-6-openjdk/lib/security"], File["/usr/lib/jvm/java-6-openjdk/lib/cacerts"]],
@@ -45,6 +46,12 @@ class appscale_dependencies {
     command => "easy_install pip",
     unless => "which pip",
     require => Package["python-setuptools"],
+  }
+
+  exec { "install_rubygems_json":
+    command => "gem install json --no-ri --no-rdoc",
+    unless => "echo \"require 'rubygems'; require 'json'\" | ruby",
+    require => [Package["appscale-rubygems"], Package["ruby1.8-dev"]],
   }
 
   exec { "install_virtualenvwrapper":
