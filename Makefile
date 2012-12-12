@@ -44,4 +44,4 @@ build:
 f ?= appscaletools
 .PHONY: pylint
 pylint:
-	PYTHONPATH=lint pylint --rcfile=files/etc/pylintrc --load-plugins astng_sh $(f)
+	PYTHONPATH=lint:$(pwd) pylint --rcfile=files/etc/pylintrc --load-plugins astng_sh $(f)
