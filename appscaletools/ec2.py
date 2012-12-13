@@ -6,6 +6,8 @@ import re
 
 import sh
 
+from boto.ec2.connection import EC2Connection
+
 EC2_DESCRIBE_INSTANCES_RE = re.compile((
     r'INSTANCE\s+(?P<instance_id>\S+)\s+'
     r'(?P<ami_id>\S+)\s+'
@@ -42,3 +44,20 @@ EC2_EBS_RUNNING_INSTANCE_SAMPLE = (
     'running berto   0       m1.small    2012-11-26T19:55:18+0000    us-east-1d  aki-427d952b            '
     'monitoring-disabled 54.235.243.239  10.62.97.8          ebs     '
 )
+
+CONNECTIONS = []
+def get_connection():
+    """
+    Return a Boto EC2Connection instance.
+
+    This will cache the connection and return it on subsequent requests.
+    """
+
+    if CONNECTIONS:
+        return CONNECTIONS[0]
+
+    connection = EC2Connection()
+
+    CONNECTIONS.append(connection)
+
+    return connection
