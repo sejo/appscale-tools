@@ -4,7 +4,7 @@ AppScale Cloud module.
 
 import logging
 
-from boto.ec2.connection import EC2Connection
+from appscaletools.ec2 import get_connection
 
 class Cloud(object):
     """
@@ -14,7 +14,7 @@ class Cloud(object):
     """
 
     def __init__(self, name, logger=None):
-        self.connection = EC2Connection()
+        self.connection = get_connection()
         self.name = name
 
         self.logger = logger or logging.getLogger('Cloud')
