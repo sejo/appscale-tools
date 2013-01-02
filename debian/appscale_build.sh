@@ -4,8 +4,8 @@ DIST=`lsb_release -c -s`
 
 cd `dirname $0`/..
 
-if [ ! -e ./debian/appscale_install_${DIST}.sh ]; then
-    echo "${DIST} is not supported."
+if [ ${DIST} != lucid ]; then
+    echo "Sorry, only ${DIST} is supported"
     exit 1
 fi
 
