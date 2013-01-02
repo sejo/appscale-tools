@@ -6,6 +6,11 @@
 #
 # Written by Yoshi <nomura@pobox.com>
 
+appscale_tools=$(dirname $0)/../etc/profile.d/appscale_tools.sh
+if [ -e ${appsacle_tools} ]; then
+    source ${appscale_tools}
+fi
+
 if [ -z "$APPSCALE_HOME_RUNTIME" ]; then
     export APPSCALE_HOME_RUNTIME=/root/appscale
 fi
