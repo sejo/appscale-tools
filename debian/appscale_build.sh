@@ -29,7 +29,7 @@ cp -v LICENSE README $TARGETDIR || exit 1
 
 # install scripts
 
-bash debian/appscale_install_${DIST}.sh all
+bash debian/appscale_install.sh all
 if [ $? -ne 0 ]; then
     echo "Unable to complete AppScale tools installation."
     exit 1
