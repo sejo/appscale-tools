@@ -1,0 +1,27 @@
+- hosts: appscale01.sejo-it.be
+  user: ansible
+  sudo: yes
+  tasks: 
+    - name: install expect and expect-dev
+      action: apt pkg=$item state=present
+      with_items: 
+        - expect
+        - expect-dev
+    - name: install python libraries needed with pip
+      action: pip name=$item
+      with_items: 
+        - termcolor
+        - SOAPpy
+        - pyyaml
+        - oauth2client
+        - google-api-python-client
+        - httplib2
+        - argparse
+    - name: install boto version 2.6
+      action: pip name=boto version=2.6
+    - name: clone appscale git
+      action: git repo=https://github.com/sejo/appscale-tools.git dest=/srv/appscale-tools
+    - name: build it
+      action: command bash debian/appscale_build.sh chdir=/srv/appscale-tools
+      async: 7200
+      poll: 30
